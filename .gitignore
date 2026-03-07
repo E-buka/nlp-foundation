@@ -1,0 +1,36 @@
+# virtual environment
+.venv/
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter
+.ipynb_checkpoints/
+
+# environment files
+.env
+
+# system files
+.DS_Store
+Thumbs.db
+
+# model/data artifacts
+data/
+models/
+outputs/
+checkpoints/
+
+# vscode
+.vscode/
+
+# data
+data/
+*.csv
+*.parquet
+
+# spark outputs
+*_SUCCESS
+part-*
