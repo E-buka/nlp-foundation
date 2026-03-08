@@ -1,39 +1,12 @@
-from pandas import DataFrame
-import pandas as pd
 from collections import Counter
 
 import torch
 from torch.utils.data import DataLoader
-from torch.nn.utils.rnn import pad_sequence
+
+from .make_data import collate_batch, CustomTextData, load_csv_data 
 
 device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else 'cpu'
 
-def load_csv_data(path_list:list[str], feature_col:str, label_col:str, **params) -> DataFrame: 
-    ## load and concatenate data
-    if not path_list:
-        raise ValueError("Please provide data path as string or list of strings")
-        
-    elif isinstance(path_list, list):
-        data = pd.DataFrame()
-        while len(path_list) > 0: 
-            try: 
-                path = path_list.pop()
-                data_ = pd.read_csv(path, **params) if params else pd.read_csv(path)
-            except Exception as e: 
-                print(f"Error loading {path}: {e}")
-                data_ = None
-            data = pd.concat([data, data_], axis=0, ignore_index=True)
-        if data.shape == (0, 0):
-            raise ValueError("Empty dataframe returned")
-        return data[[feature_col, label_col]].sample(frac=1.0, ignore_index=True)
-        
-    elif isinstance(path_list, str):
-        data = pd.read_csv(path_list, **params) if params else pd.read_csv(path_list)
-        if data.shape == (0, 0):
-            raise ValueError("Empty dataframe returned")
-        return data[[feature_col, label_col]].sample(frac=1.0, ignore_index=True)
-    else:
-        raise ValueError("Please provide data path as string or list of strings")
 
 def tokenize(text):
     return text.lower().split()
@@ -55,17 +28,6 @@ def build_vocab(dataset, max_size=None):
 
     return vocab
 
-
-def collate_batch(batch):
-    label_list, text_list = [], []
-    for (_text, _label) in batch: 
-        label_list.append(_label)
-        processed_text = torch.tensor(_text)
-        text_list.append(processed_text)
-
-    padded_text = pad_sequence(text_list, batch_first=True, padding_value=1.0)
-    return padded_text.to(device), torch.tensor(label_list, dtype=torch.float64).to(device)
-  
 
 
 def build_dataloaders(config, path_list, feature_col, label_col, **params):
