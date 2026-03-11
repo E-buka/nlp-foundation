@@ -1,4 +1,6 @@
 import torch
+
+
 class Trainer:
     def __init__(self, model, criterion, optimizer, device):
         

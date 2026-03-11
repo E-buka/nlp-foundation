@@ -1,6 +1,9 @@
 model:
     embedding_dim: 200
     hidden_dim: 128
+    num_layers: 1
+    dropout: 0.3
+    output_dim: 1
 
 training:
     batch_size: 128
@@ -13,3 +16,10 @@ training:
 seed:
     seed: 777
 
+data:
+    train_frac: 0.7
+    test_frac: 0.5
+    val_frac: 0.5
+    feature_col: "clean_text"
+    label_col : "target_reaction"
+    path: None

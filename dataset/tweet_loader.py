@@ -1,12 +1,14 @@
 from collections import Counter
-
+import yaml
 import torch
 from torch.utils.data import DataLoader
 
 from .make_data import collate_batch, CustomTextData, load_csv_data 
 
-device = torch.accelerator.current_accelerator().type if torch.accelerator.is_available() else 'cpu'
 
+
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
 def tokenize(text):
     return text.lower().split()
@@ -23,40 +25,41 @@ def build_vocab(dataset, max_size=None):
     for word, _ in counter.most_common(max_size):
         if word not in vocab:
             vocab[word] = len(vocab)
-        if len(vocab) == max_vocab_size: #max_vocab_size in config
+        if len(vocab) == config["traning"]["max_vocab_size"]: 
             break
 
     return vocab
 
 
 
-def build_dataloaders(config, path_list, feature_col, label_col, **params):
-    data = load_csv_data(path_list, feature_col, label_col, params) # can pass to config
+def build_dataloaders(config, **params):
+    data = load_csv_data(config["data"]["path"], config["data"]["feature_col"], 
+                         config["data"]["label_col"], params) 
     if not data:
         return None
     ## split data into train and validation data
     data.dropna(axis=0, inplace=True, ignore_index=True)
     data.drop_duplicates(inplace=True, ignore_index=True)
     
-    train_data = data.sample(frac=0.7) # frac as arg
+    train_data = data.sample(frac=config["data"]["train_frac"]) 
     val_data = data.drop(train_data.index)
-    test_data = val_data.sample(frac=0.5) # frac as arg
+    test_data = val_data.sample(frac=config["data"]["test_frac"]) 
     val_data = val_data.drop(test_data.index)
     
     train_data, val_data = train_data.reset_index(drop=True), val_data.reset_index(drop=True)
     test_data = test_data.reset_index(drop=True)
     
     # build vocabulary from training set
-    vocabulary = build_vocab(train_data[feature_col])
+    vocabulary = build_vocab(train_data[config["data"]["feature_col"]])
     
     # create dataset objects
-    train_dataset = CustomTextData(train_data[feature_col], train_data[label_col], vocabulary)
-    val_dataset = CustomTextData(val_data[feature_col], val_data[label_col], vocabulary)
-    test_dataset = CustomTextData(test_data[feature_col], test_data[label_col], vocabulary)
+    train_dataset = CustomTextData(train_data[config["data"]["feature_col"]], train_data[config["data"]["label_col"]], vocabulary)
+    val_dataset = CustomTextData(val_data[config["data"]["feature_col"]], val_data[config["data"]["label_col"]], vocabulary)
+    test_dataset = CustomTextData(test_data[config["data"]["feature_col"]], test_data[config["data"]["label_col"]], vocabulary)
     
     # create data loaders 
-    train_loader = DataLoader(train_dataset, collate_fn=collate_batch, batch_size=batch_size, shuffle=True)
-    val_loader =  DataLoader(val_dataset, collate_fn=collate_batch, batch_size=batch_size, shuffle=True)
-    test_loader =  DataLoader(test_dataset, collate_fn=collate_batch, batch_size=batch_size, shuffle=True)
+    train_loader = DataLoader(train_dataset, collate_fn=collate_batch, batch_size=config["training"]["batch_size"], shuffle=True)
+    val_loader =  DataLoader(val_dataset, collate_fn=collate_batch, batch_size=config["training"]["batch_size"], shuffle=True)
+    test_loader =  DataLoader(test_dataset, collate_fn=collate_batch, batch_size=config["training"]["batch_size"], shuffle=True)
         
     return train_loader, val_loader, test_loader, vocabulary

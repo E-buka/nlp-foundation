@@ -4,6 +4,10 @@ from torch.nn.utils.rnn import pad_sequence
 
 from pandas import DataFrame
 import pandas as pd
+import yaml 
+
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
 
 
 class CustomTextData(Dataset):
@@ -25,16 +29,16 @@ def collate_batch(batch):
     padded_seq = pad_sequence(texts, batch_first=True, padding_val=1.0)
     return padded_seq, torch.tensor(labels)
 
-def load_csv_data(path_list:list[str], feature_col:str, label_col:str, **params) -> DataFrame: 
+def load_csv_data(config, **params) -> DataFrame: 
     ## load and concatenate data
-    if not path_list:
+    if not config["data"]["path"]:
         raise ValueError("Please provide data path as string or list of strings")
         
-    elif isinstance(path_list, list):
+    elif isinstance(config["data"]["path"], list):
         data = pd.DataFrame()
-        while len(path_list) > 0: 
+        while len(config["data"]["path"]) > 0: 
             try: 
-                path = path_list.pop()
+                path = config["data"]["path"].pop()
                 data_ = pd.read_csv(path, **params) if params else pd.read_csv(path)
             except Exception as e: 
                 print(f"Error loading {path}: {e}")
@@ -42,13 +46,13 @@ def load_csv_data(path_list:list[str], feature_col:str, label_col:str, **params)
             data = pd.concat([data, data_], axis=0, ignore_index=True)
         if data.shape == (0, 0):
             raise ValueError("Empty dataframe returned")
-        return data[[feature_col, label_col]].sample(frac=1.0, ignore_index=True)
+        return data[[config["data"]["feature_col"], config["data"]["label_col"]]].sample(frac=1.0, ignore_index=True)
         
-    elif isinstance(path_list, str):
-        data = pd.read_csv(path_list, **params) if params else pd.read_csv(path_list)
+    elif isinstance(config["data"]["path"], str):
+        data = pd.read_csv(config["data"]["path"], **params) if params else pd.read_csv(config["data"]["path"])
         if data.shape == (0, 0):
             raise ValueError("Empty dataframe returned")
-        return data[[feature_col, label_col]].sample(frac=1.0, ignore_index=True)
+        return data[[config["data"]["feature_col"], config["data"]["label_col"]]].sample(frac=1.0, ignore_index=True)
     else:
         raise ValueError("Please provide data path as string or list of strings")
 
