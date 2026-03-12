@@ -24,7 +24,7 @@ def main(config):
         json.dump(vocab, f)
     
     model = build_model(
-        model_name = "lstm", 
+        model_name = "embedding", 
         vocab_size = len(vocab),
         config=config,
     ).to(device)
@@ -39,7 +39,7 @@ def main(config):
     trainer = Trainer(model, criterion, optimizer, device)
     history = trainer.fit(train_loader, val_loader, epochs=config["training"]["epochs"])
     
-    model.load_state_dict(torch.load("models/best_model.pt", map_location=device))
+    model.load_state_dict(torch.load("models/best_model_emb.pt", map_location=device))
     test_metrics = evaluate_model(model, test_loader, device)
     
     with open("history/train_history.json", "w") as h:

@@ -43,7 +43,7 @@ def predict(tweet: str) -> json :
         config=config,
     )
     
-    model.load_state_dict(torch.load("models/best_model.pt"))
+    model.load_state_dict(torch.load("models/best_model_emb.pt"))
     model.eval()
     with torch.no_grad():
         logits = model(inputs)
