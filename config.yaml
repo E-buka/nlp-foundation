@@ -2,14 +2,14 @@ model:
     embedding_dim: 200
     hidden_dim: 128
     num_layers: 1
-    dropout: 0.3
+    dropout: 0
     output_dim: 1
 
 training:
     batch_size: 128
     lr: 0.001
     epochs: 20
-    weight_decay: 1e-5
+    weight_decay: 0.00001
     dropout: 0.3
     max_vocab_size: 30000
 
@@ -22,4 +22,4 @@ data:
     val_frac: 0.5
     feature_col: "clean_text"
     label_col : "target_reaction"
-    path: None
+    path: ["data/tweet_pos_1.csv", "data/tweet_neg_2.csv"]

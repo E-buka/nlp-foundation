@@ -26,7 +26,7 @@ class CustomTextData(Dataset):
         
 def collate_batch(batch):
     texts, labels = zip(*batch)
-    padded_seq = pad_sequence(texts, batch_first=True, padding_val=1.0)
+    padded_seq = pad_sequence(texts, batch_first=True, padding_value=1)
     return padded_seq, torch.tensor(labels)
 
 def load_csv_data(config, **params) -> DataFrame: 

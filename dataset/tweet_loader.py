@@ -6,7 +6,6 @@ from torch.utils.data import DataLoader
 from .make_data import collate_batch, CustomTextData, load_csv_data 
 
 
-
 with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 
@@ -25,7 +24,7 @@ def build_vocab(dataset, max_size=None):
     for word, _ in counter.most_common(max_size):
         if word not in vocab:
             vocab[word] = len(vocab)
-        if len(vocab) == config["traning"]["max_vocab_size"]: 
+        if len(vocab) == config["training"]["max_vocab_size"]: 
             break
 
     return vocab
@@ -33,9 +32,10 @@ def build_vocab(dataset, max_size=None):
 
 
 def build_dataloaders(config, **params):
-    data = load_csv_data(config["data"]["path"], config["data"]["feature_col"], 
-                         config["data"]["label_col"], params) 
-    if not data:
+    data = None
+    data = load_csv_data(config, **params) 
+    
+    if data is None:
         return None
     ## split data into train and validation data
     data.dropna(axis=0, inplace=True, ignore_index=True)
