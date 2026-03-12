@@ -23,7 +23,7 @@ class PredictionResult:
     
     
 def get_tweet(tweet: str):
-    return re.findall(r"(?u)\b\w\w+\b", tweet.lower())
+    return re.findall(r"(?u)[#@]?\b\w\w+\b", tweet.lower())
   
 def numericalize(tokens):
     with open("artifacts/vocab.json") as f:
