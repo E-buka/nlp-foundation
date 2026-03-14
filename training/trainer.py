@@ -1,6 +1,5 @@
 import torch
 
-
 class Trainer:
     def __init__(self, model, criterion, optimizer, device):
         
@@ -52,7 +51,7 @@ class Trainer:
             logits = self.model(inputs).reshape(-1) 
             loss = self.criterion(logits, labels) 
             
-            total_loss += loss.item()
+            total_loss += loss.item() * labels.size(0)
             preds = (torch.sigmoid(logits) >=0.5).long()
             total_correct += (preds == labels.long()).sum().item()
             total_samples += labels.size(0)
@@ -63,7 +62,7 @@ class Trainer:
         }
             
             
-    def fit(self, train_loader, val_loader, epochs):
+    def fit(self, train_loader, val_loader, epochs, ROOT):
         history = {
             "train_loss": [],
             "train_accuracy": [],
@@ -92,6 +91,6 @@ class Trainer:
             
             if val_metrics['loss'] < best_val_loss:
                 best_val_loss = val_metrics["loss"]
-                torch.save(self.model.state_dict(), "models/best_model_emb.pt")
+                torch.save(self.model.state_dict(), ROOT/"models"/"best_model.pt")
                 
         return history 

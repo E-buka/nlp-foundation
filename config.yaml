@@ -11,7 +11,7 @@ training:
     epochs: 20
     weight_decay: 0.00001
     dropout: 0.3
-    max_vocab_size: 30000
+    max_vocab_size: 50000
 
 seed:
     seed: 777
@@ -19,7 +19,6 @@ seed:
 data:
     train_frac: 0.7
     test_frac: 0.5
-    val_frac: 0.5
     feature_col: "clean_text"
     label_col : "target_reaction"
     path: ["data/tweet_pos_1.csv", "data/tweet_neg_2.csv"]

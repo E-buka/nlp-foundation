@@ -1,18 +1,13 @@
 from collections import Counter
-import yaml
-import torch
 from torch.utils.data import DataLoader
-
+import re 
 from .make_data import collate_batch, CustomTextData, load_csv_data 
 
 
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+def tokenize(tweet):
+    return re.findall(r"(?u)[#@]?\b\w\w+\b", tweet.lower())
 
-def tokenize(text):
-    return text.lower().split()
-
-def build_vocab(dataset, max_size=None):
+def build_vocab(config, dataset, max_size=None):
     counter = Counter()
     for text in dataset:
         counter.update(tokenize(text))
@@ -50,16 +45,16 @@ def build_dataloaders(config, **params):
     test_data = test_data.reset_index(drop=True)
     
     # build vocabulary from training set
-    vocabulary = build_vocab(train_data[config["data"]["feature_col"]])
+    vocabulary = build_vocab(config, train_data[config["data"]["feature_col"]])
     
     # create dataset objects
-    train_dataset = CustomTextData(train_data[config["data"]["feature_col"]], train_data[config["data"]["label_col"]], vocabulary)
-    val_dataset = CustomTextData(val_data[config["data"]["feature_col"]], val_data[config["data"]["label_col"]], vocabulary)
-    test_dataset = CustomTextData(test_data[config["data"]["feature_col"]], test_data[config["data"]["label_col"]], vocabulary)
+    train_dataset = CustomTextData(train_data[config["data"]["feature_col"]], train_data[config["data"]["label_col"]], vocabulary, tokenize)
+    val_dataset = CustomTextData(val_data[config["data"]["feature_col"]], val_data[config["data"]["label_col"]], vocabulary, tokenize)
+    test_dataset = CustomTextData(test_data[config["data"]["feature_col"]], test_data[config["data"]["label_col"]], vocabulary, tokenize)
     
     # create data loaders 
     train_loader = DataLoader(train_dataset, collate_fn=collate_batch, batch_size=config["training"]["batch_size"], shuffle=True)
-    val_loader =  DataLoader(val_dataset, collate_fn=collate_batch, batch_size=config["training"]["batch_size"], shuffle=True)
-    test_loader =  DataLoader(test_dataset, collate_fn=collate_batch, batch_size=config["training"]["batch_size"], shuffle=True)
+    val_loader =  DataLoader(val_dataset, collate_fn=collate_batch, batch_size=config["training"]["batch_size"])
+    test_loader =  DataLoader(test_dataset, collate_fn=collate_batch, batch_size=config["training"]["batch_size"])
         
     return train_loader, val_loader, test_loader, vocabulary

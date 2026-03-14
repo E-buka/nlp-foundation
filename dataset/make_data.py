@@ -3,23 +3,21 @@ import torch
 from torch.nn.utils.rnn import pad_sequence
 
 from pandas import DataFrame
-import pandas as pd
-import yaml 
+import pandas as pd 
 
-with open("config.yaml", "r") as f:
-    config = yaml.safe_load(f)
 
 
 class CustomTextData(Dataset):
-    def __init__(self, texts, labels, vocabulary):
+    def __init__(self, texts, labels, vocabulary, tokenize):
         self.texts = texts
         self.labels = labels
         self.vocabulary = vocabulary
+        self.tokenize = tokenize
         
     def __getitem__(self, index):
-        tokens = self.texts[index].lower().split()
-        text_indices = [self.vocabulary.get(tok, self.vocabulary["<unk>"]) for tok in tokens]
-        return torch.tensor(text_indices), torch.tensor(self.labels[index])
+        tokens = self.texts.iloc[index]
+        text_indices = [self.vocabulary.get(tok, self.vocabulary["<unk>"]) for tok in self.tokenize(tokens)]
+        return torch.tensor(text_indices), torch.tensor(self.labels.iloc[index])
     
     def __len__(self):
         return len(self.texts)
@@ -36,9 +34,8 @@ def load_csv_data(config, **params) -> DataFrame:
         
     elif isinstance(config["data"]["path"], list):
         data = pd.DataFrame()
-        while len(config["data"]["path"]) > 0: 
+        for path in config["data"]["path"]: 
             try: 
-                path = config["data"]["path"].pop()
                 data_ = pd.read_csv(path, **params) if params else pd.read_csv(path)
             except Exception as e: 
                 print(f"Error loading {path}: {e}")
