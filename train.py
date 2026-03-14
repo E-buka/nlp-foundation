@@ -11,6 +11,10 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 
+(ROOT / "artifacts").mkdir(exist_ok=True)
+(ROOT / "history").mkdir(exist_ok=True)
+(ROOT / "models").mkdir(exist_ok=True)
+
 with open(ROOT/"config.yaml", "r") as f:
     config = yaml.safe_load(f)
 

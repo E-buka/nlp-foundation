@@ -7,7 +7,7 @@ from .make_data import collate_batch, CustomTextData, load_csv_data
 def tokenize(tweet):
     return re.findall(r"(?u)[#@]?\b\w\w+\b", tweet.lower())
 
-def build_vocab(config, dataset, max_size=None):
+def build_vocab(config, dataset):
     counter = Counter()
     for text in dataset:
         counter.update(tokenize(text))
@@ -16,7 +16,7 @@ def build_vocab(config, dataset, max_size=None):
     "<unk>": 0, # setting any word that is not in the vocabulary to zero
     "<pad>":1  # setting the padding index to 1
     }
-    for word, _ in counter.most_common(max_size):
+    for word, _ in counter.most_common():
         if word not in vocab:
             vocab[word] = len(vocab)
         if len(vocab) == config["training"]["max_vocab_size"]: 

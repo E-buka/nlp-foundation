@@ -7,12 +7,27 @@ import yaml
 from pathlib import Path
 from dataset.tweet_loader import tokenize
 
-ROOT = Path(__file__).resolve().parent
 
-with open(ROOT/"config.yaml", "r") as f:
-    config = yaml.safe_load(f)
+def load_predictor():
+    ROOT = Path(__file__).resolve().parent
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    with open(ROOT/"config.yaml", "r") as f:
+        config = yaml.safe_load(f)
+
+    with open(ROOT/"artifacts"/"vocab.json") as f:
+        vocab = json.load(f)
+    
+    model = build_model(
+        model_name = "lstm", 
+        vocab_size = len(vocab),
+        config=config,
+    )
+    model.load_state_dict(torch.load(ROOT/"models"/"best_model.pt", map_location=device))
+    model.to(device)
+    
+    return config, vocab, model, device
+ 
 
 @dataclass 
 class PredictionResult: 
@@ -26,26 +41,18 @@ class PredictionResult:
         }
         return json.dumps(result)
  
-with open(ROOT/"artifacts"/"vocab.json") as f:
-    vocab = json.load(f)
-    
-model = build_model(
-        model_name = "lstm", 
-        vocab_size = len(vocab),
-        config=config,
-    )
 
-model.load_state_dict(torch.load(ROOT/"models"/"best_model.pt", map_location=device))
-model.to(device)
- 
+config, vocab, model, device = load_predictor()   
+
 def numericalize(tokens, vocab):        
     token_indices = [vocab.get(tok, vocab["<unk>"]) for tok in tokens]
     token_indices = torch.tensor(token_indices).long()
     return token_indices.unsqueeze(0)
 
-def predict(tweet: str, tokenize, vocab, model) -> json :
+def predict(tweet: str, tokenize, vocab, model, device) -> json :
+    
     tensor = numericalize(tokenize(tweet), vocab)
-    inputs = pad_sequence(tensor, batch_first=True)
+    inputs = pad_sequence(tensor, batch_first=True).to(device)
     
     model.eval()
     with torch.no_grad():
@@ -62,5 +69,5 @@ def predict(tweet: str, tokenize, vocab, model) -> json :
 
     
 if __name__ == "__main__":
-    prediction = predict("come on, you are doing great",tokenize, vocab, model)
+    prediction = predict("come on, you are doing great", tokenize, vocab, model, device)
     print(prediction)
