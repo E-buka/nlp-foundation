@@ -27,7 +27,7 @@ def main(config):
         json.dump(vocab, f)
     
     model = build_model(
-        model_name = "lstm", 
+        model_name = "lstm", ## enter model to train as lstm or embedding
         vocab_size = len(vocab),
         config=config,
     ).to(device)

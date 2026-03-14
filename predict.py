@@ -21,8 +21,8 @@ class PredictionResult:
     
     def json_result(self):
         result = {
-            "prediction_label":self.label, 
-            "prediction_probability": self.probability,
+            "predicted_label":self.label, 
+            "predicted_probability": self.probability,
         }
         return json.dumps(result)
  
