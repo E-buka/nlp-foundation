@@ -32,7 +32,7 @@ nlp-foundation/
 │   └── trainer.py
 ├── utils/
 │   ├── __init__.py
-|   ├── metrics.py
+│   ├── metrics.py
 │   └── seed.py
 ├── config.yaml
 ├── predict.py
@@ -45,9 +45,9 @@ nlp-foundation/
 
 Create and activate a virtual environment, then install dependencies:
 
-`bash`
+```bash
 pip install -r requirements.txt
-
+```
 
 ## Training
 
@@ -68,26 +68,26 @@ The training script:
 
 Run training with:
 
-`bash`
+```bash
 python train.py
-
+```
 
 ## Prediction
 
-The `predict.py` script loads the saved model, vocabulary, and configuration through `load_predictor()`. These are then used by the `predict()` function to generate predictions for input text.
+The predict.py script loads the saved model, vocabulary, and configuration once through load_predictor(), then reuses them for inference.
 
 The prediction output is returned as a JSON string containing:
 - the predicted label
 - the predicted probability
 
-`bash`
+```bash
 python predict.py 
-
+```
 
 ## Sample Prediction Output
-
+```json
 {"predicted_label": 1, "predicted_probability": 0.71932}
-
+```
 
 
 ## Limitations

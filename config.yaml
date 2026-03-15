@@ -21,3 +21,5 @@ data:
     feature_col: "clean_text"
     label_col : "target_reaction"
     path: ["data/tweet_pos_1.csv", "data/tweet_neg_2.csv"]
+
+selected_model: "lstm"

@@ -19,7 +19,7 @@ def load_predictor():
         vocab = json.load(f)
     
     model = build_model(
-        model_name = "lstm", 
+        model_name = config['selected_model'], 
         vocab_size = len(vocab),
         config=config,
     )
