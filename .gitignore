@@ -18,8 +18,6 @@ __pycache__/
 Thumbs.db
 
 # model/data artifacts
-data/
-models/
 outputs/
 checkpoints/
 
@@ -28,7 +26,7 @@ checkpoints/
 
 # data
 data/
-*.csv
+#*.csv
 *.parquet
 
 # spark outputs
