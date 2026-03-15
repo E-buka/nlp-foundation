@@ -8,7 +8,6 @@ The dataset is split into training, validation, and test sets in a 70/15/15 rati
 
 ## Folder Structure
 
-```text
 nlp-foundation/
 ├── artifacts/
 │   └── vocab.json
@@ -41,15 +40,15 @@ nlp-foundation/
 ├── requirements.txt
 └── train.py
 
-```md
+
 ## Installation
 
 Create and activate a virtual environment, then install dependencies:
 
-```bash
+`bash`
 pip install -r requirements.txt
 
-```md
+
 ## Training
 
 All training parameters are defined in `config.yaml`, including data paths, model settings, and training hyperparameters.
@@ -69,10 +68,10 @@ The training script:
 
 Run training with:
 
-```bash
+`bash`
 python train.py
 
-```md
+
 ## Prediction
 
 The `predict.py` script loads the saved model, vocabulary, and configuration through `load_predictor()`. These are then used by the `predict()` function to generate predictions for input text.
@@ -81,17 +80,16 @@ The prediction output is returned as a JSON string containing:
 - the predicted label
 - the predicted probability
 
-```bash
+`bash`
 python predict.py 
 
-```md
+
 ## Sample Prediction Output
 
-```json
 {"predicted_label": 1, "predicted_probability": 0.71932}
 
 
-```md
+
 ## Limitations
 
 This project uses a cleaned tweet dataset rather than raw tweet text. As a result, some tweet-specific signals such as hashtags, mentions, apostrophes, and other social-media-specific patterns are not fully represented in the training vocabulary.
