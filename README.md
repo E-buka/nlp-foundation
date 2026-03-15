@@ -7,7 +7,7 @@ This project builds a small production-style NLP text classifier for tweet senti
 The dataset is split into training, validation, and test sets in a 70/15/15 ratio. A vocabulary is built from the training set only. Two neural baseline architectures are implemented: an embedding-based classifier and an LSTM classifier. The selected model is trained for 20 epochs, the best model by validation loss is saved, and training history and test metrics are exported as JSON files.
 
 ## Folder Structure
-
+```text
 nlp-foundation/
 ├── artifacts/
 │   └── vocab.json
@@ -39,7 +39,7 @@ nlp-foundation/
 ├── README.md
 ├── requirements.txt
 └── train.py
-
+```
 
 ## Installation
 
