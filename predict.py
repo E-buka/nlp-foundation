@@ -5,7 +5,7 @@ from torch.nn.utils.rnn import pad_sequence
 from models.build_model import build_model
 import yaml 
 from pathlib import Path
-from dataset.tweet_loader import tokenize
+
 
 
 def load_predictor():
@@ -25,6 +25,7 @@ def load_predictor():
     )
     model.load_state_dict(torch.load(ROOT/"models"/"best_model.pt", map_location=device))
     model.to(device)
+    model.eval()
     
     return config, vocab, model, device
  
@@ -49,12 +50,12 @@ def numericalize(tokens, vocab):
     token_indices = torch.tensor(token_indices).long()
     return token_indices.unsqueeze(0)
 
-def predict(tweet: str, tokenize, vocab, model, device) -> json :
+def predict(tweet: str, vocab, model, device) -> str :
+    from dataset.tweet_loader import tokenize
     
     tensor = numericalize(tokenize(tweet), vocab)
     inputs = pad_sequence(tensor, batch_first=True).to(device)
     
-    model.eval()
     with torch.no_grad():
         logits = model(inputs)
         probs = torch.sigmoid(logits)
@@ -69,5 +70,5 @@ def predict(tweet: str, tokenize, vocab, model, device) -> json :
 
     
 if __name__ == "__main__":
-    prediction = predict("come on, you are doing great", tokenize, vocab, model, device)
+    prediction = predict("come on, you are doing great", vocab, model, device)
     print(prediction)

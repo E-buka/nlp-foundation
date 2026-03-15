@@ -1,61 +1,116 @@
-## NLP-Foundation 
-### Project summary
-The objective of this project is to build a production style mini-NLP classifier. The dataset used for the project is a subset (ca 250k) of the tweet dataset from kaggle dataset.  The dataset however, is a cleaned subset of the data from the tweet-project repository. 
-In the project, the tweet dataset was loaded, and split into three parts, 70% for training, 15% for validation and 15% for testing. A vocabulary set was built using the training dataset. A linear classifier with LSTM model was used to train the data for 20 epochs and training and validation results saved as json file in history directory. The trained model was loaded and used to predict the test data and results saved as json file in history directory.
+# NLP-Foundation: Tweet Sentiment Classifier
 
-#### Folder structure
- nlp-foundation/ 
-    
-data/
-    tweet_pos_1.csv
-    tweet_neg_2.csv
+## Project Summary
 
-dataset/
-    __ init__.py
-    make_data.py
-    tweet_loader.py
+This project builds a small production-style NLP text classifier for tweet sentiment prediction. It uses a cleaned subset of a Kaggle tweet dataset, prepared from the larger `tweet-project` repository.
 
-history/
-    train_history.json
-    test_metrics.json
+The dataset is split into training, validation, and test sets in a 70/15/15 ratio. A vocabulary is built from the training set only. Two neural baseline architectures are implemented: an embedding-based classifier and an LSTM classifier. The selected model is trained for 20 epochs, the best model by validation loss is saved, and training history and test metrics are exported as JSON files.
 
-models/ 
-    __ init__.py
-    build_model.py
-    embedding_model.py
-    lstm_model.py
-    best_model.pt
+## Folder Structure
 
+```text
+nlp-foundation/
+├── artifacts/
+│   └── vocab.json
+├── data/
+│   ├── tweet_neg_2.csv
+│   └── tweet_pos_1.csv
+├── dataset/
+│   ├── __init__.py
+│   ├── make_data.py
+│   └── tweet_loader.py
+├── history/
+│   ├── test_metrics.json
+│   └── train_history.json
+├── models/
+│   ├── __init__.py
+│   ├── best_model.pt
+│   ├── build_model.py
+│   ├── embedding_model.py
+│   └── lstm_model.py
+├── training/
+│   ├── __init__.py
+│   └── trainer.py
+├── utils/
+│   ├── __init__.py
+|   ├── metrics.py
+│   └── seed.py
+├── config.yaml
+├── predict.py
+├── README.md
+├── requirements.txt
+└── train.py
 
-training/
-    __ init__.py
-    trainer.py
+```md
+## Installation
 
-utils/
-    __ init__.py
-    metrics.py
-    seed.py
+Create and activate a virtual environment, then install dependencies:
 
-__ init__.py
-train.py
-predict.py
-config.yaml
+```bash
+pip install -r requirements.txt
 
-#### install
-Install the dependencies by running requirements.txt file.
+```md
+## Training
 
-#### Train
-All the model parameters are set in the configuration file - config.yaml. This includes the path to the data, model parameters and training epochs. The configuration parameters are imported automatically into the train.py file for model training.  
-Two types of model has been defined for training and these are NN.embedding model and LSTM model.  Choose the model to train as "lstm" or "embedding" in the commented section of main() function within trian.py file. The script has been trained on lstm model.  The model with the best validation error is saved automatically in the models directory while the training and test metrics are saved in the history directory as json files.  
+All training parameters are defined in `config.yaml`, including data paths, model settings, and training hyperparameters.
 
-#### Predict
-Run the predict.py file to predict sample texts. Run load_predictor() function to load the saved model, vocabulary and configurations.  . The model, vocabulary and configurations are passed to the predict() function with a sample tweet as string.  The prediction for the tweet is returned as a json string showing both the predicted label and probability. 
+Two model options are available:
+- `embedding`
+- `lstm`
 
-####  Prediction sample
+Select the model to train inside `train.py` by setting the `model_name` argument in `build_model()`.
+
+The training script:
+- loads and splits the dataset
+- builds the vocabulary from the training set
+- trains the selected model
+- saves the best model by validation loss to `models/best_model.pt`
+- saves training history and final test metrics to the `history/` directory
+
+Run training with:
+
+```bash
+python train.py
+
+```md
+## Prediction
+
+The `predict.py` script loads the saved model, vocabulary, and configuration through `load_predictor()`. These are then used by the `predict()` function to generate predictions for input text.
+
+The prediction output is returned as a JSON string containing:
+- the predicted label
+- the predicted probability
+
+```bash
+python predict.py 
+
+```md
+## Sample Prediction Output
+
+```json
 {"predicted_label": 1, "predicted_probability": 0.71932}
 
-#### Limitations
-One of the limitations of this project is the use of cleaned dataset and custom tokenizer for training and tokenisation. The tokenizer used regular expression to capture some tweet unique semantics, however, the vocabulary was built from a cleaned dataset which did not take these semantics into account, such as: #, @, ', etc. These are common in everyday tweets and the model did not use tweet specific tokenizers.  The model was trained only for 20 epochs which is a small training cycle for a neural model.  The project does not include logging for ease of debugging, hyperparameter search or learning rate schedulign for optimised model training.  
 
-#### Future Improvements
-In the future, in order to capture tweet specific semantics, the raw dataset will be used in addition with tweet specific tokenizers will be used to build the vocabulary. The training epochs will be increased with the addition of early stopping, logging, learning rate scheduling and hyperparameter search. 
+```md
+## Limitations
+
+This project uses a cleaned tweet dataset rather than raw tweet text. As a result, some tweet-specific signals such as hashtags, mentions, apostrophes, and other social-media-specific patterns are not fully represented in the training vocabulary.
+
+Although a custom regex tokenizer is used, the preprocessing pipeline is still relatively simple and does not use a tweet-specific tokenizer designed for social media text.
+
+In addition, the model was trained for only 20 epochs and does not yet include:
+- early stopping
+- learning rate scheduling
+- hyperparameter tuning
+- structured logging
+
+## Future Improvements
+
+Future versions of this project could be improved by:
+
+- training on raw tweet text instead of heavily cleaned text
+- using a tweet-specific tokenizer
+- adding early stopping and learning rate scheduling
+- introducing hyperparameter search
+- improving experiment tracking and logging
+- comparing stronger architectures and pretrained embeddings

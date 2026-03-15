@@ -10,7 +10,6 @@ training:
     lr: 0.001
     epochs: 20
     weight_decay: 0.00001
-    dropout: 0.3
     max_vocab_size: 50000
 
 seed:
